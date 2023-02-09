@@ -1,13 +1,17 @@
 import React, {useState} from 'react';
 
-const categories = ['Все', 'Мясные', 'Вегетарианская', 'Гриль', 'Острые', 'Закрытые'];
+interface ICategoryProps {
+    categoryId: number
+    onClickCategoryId: Function
+}
 
-export const Categories = () => {
-    const [activeCategory, setActiveCategory] = useState(0)
+export const Categories = ({ categoryId, onClickCategoryId }: ICategoryProps) => {
 
     const onClickCategory = (index: number): void => {
-        setActiveCategory(index)
+        onClickCategoryId(index)
     }
+
+    const categories = ['Все', 'Мясные', 'Вегетарианская', 'Гриль', 'Острые', 'Закрытые'];
 
     return (
         <div className="categories">
@@ -15,7 +19,7 @@ export const Categories = () => {
                 {categories.map((categoryName, index) => (
                     <li key={index}
                         onClick={() => onClickCategory(index)}
-                        className={activeCategory === index ? "active" : ""}
+                        className={categoryId === index ? "active" : ""}
                     >
                         {categoryName}
                     </li>

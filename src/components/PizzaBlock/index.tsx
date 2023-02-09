@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import pizzaItem from "../assets/img/pizzaItem.jpg"
+import pizzaItem from "../../assets/img/pizzaItem.jpg"
 
 type TPizzaBlock = {
     imageUrl: string
