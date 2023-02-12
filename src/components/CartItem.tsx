@@ -1,20 +1,49 @@
 import React from 'react';
+import {useDispatch} from "react-redux";
+import {addPizza, minusPizza, removePizza} from "../redux/slices/cartSlice";
 
+interface ICartItem {
+    id: number
+    name: string
+    type: string
+    price: number
+    size: number
+    count: number
+    imgUrl: string
+}
 
-const CartItem = () => {
+const CartItem = ({ id, name, type, price, size, count, imgUrl }: ICartItem) => {
+
+    const dispatch = useDispatch()
+
+    const onClickMinus = () => {
+        dispatch(minusPizza(id))
+    }
+
+    const onClickPlus = () => {
+        dispatch(addPizza({id}))
+    }
+
+    const onClickRemove = () => {
+        if (window.confirm('Ты действительно хочешь удалить товар?')) {
+            dispatch(removePizza(id))
+        }
+    }
+
     return (
         <div className="cart__item">
             <div className="cart__item-img">
-                <img className="pizza-block__image" src="" alt="Pizza" />
+                <img className="pizza-block__image" src={imgUrl} alt="Pizza" />
             </div>
             <div className="cart__item-info">
-                <h3>Вкусная пицца</h3>
+                <h3>{name}</h3>
                 <p>
-                    123 см.
+                    {type}, {size} см.
                 </p>
             </div>
             <div className="cart__item-count">
                 <button
+                    onClick={onClickMinus}
                     className="button button--outline button--circle cart__item-count-minus">
                     <svg
                         width="10"
@@ -30,8 +59,9 @@ const CartItem = () => {
                             fill="#EB5A1E"></path>
                     </svg>
                 </button>
-                <b>1</b>
+                <b>{count}</b>
                 <button
+                    onClick={onClickPlus}
                     className="button button--outline button--circle cart__item-count-plus">
                     <svg
                         width="10"
@@ -49,10 +79,11 @@ const CartItem = () => {
                 </button>
             </div>
             <div className="cart__item-price">
-                <b>12000 ₽</b>
+                <b>{price * count} ₽</b>
             </div>
             <div className="cart__item-remove">
-                <div className="button button--outline button--circle">
+                <div onClick={onClickRemove}
+                    className="button button--outline button--circle">
                     <svg
                         width="10"
                         height="10"

@@ -1,55 +1,72 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
+import {useAppDispatch, useAppSelector} from "../redux/hooks/reduxHooks";
+import {setSortType} from "../redux/slices/filterSlice";
 
-export interface ISortType {
+interface ISortType {
     name: string
     sortProperty: string
 }
 
-interface ISortProps {
-    sortType: ISortType,
-    onClickSortType: Function
-}
+export const sortList = [
+    {
+        name: 'популярности (DESC)',
+        sortProperty: 'rating'
+    },
+    {
+        name: 'популярности (ASC)',
+        sortProperty: '-rating'
+    },
+    {
+        name: 'цене (DESC)',
+        sortProperty: 'price'
+    },
+    {
+        name: 'цене (ASC)',
+        sortProperty: '-price'
+    },
+    {
+        name: 'алфавиту (DESC)',
+        sortProperty: 'name'
+    },
+    {
+        name: 'алфавиту (ASC)',
+        sortProperty: '-name'
+    }
+]
 
-export const Sort = ({sortType, onClickSortType}: ISortProps) => {
-
-    console.log(sortType)
+export const Sort = () => {
+    const sortName = useAppSelector(state => state.filter.sort.name)
+    const dispatch = useAppDispatch()
+    const sortRef = useRef<HTMLDivElement>(null)
 
     const [open, setOpen] = useState(false)
 
-    const list = [
-        {
-            name: 'популярности (DESC)',
-            sortProperty: 'rating'
-        },
-        {
-            name: 'популярности (ASC)',
-            sortProperty: '-rating'
-        },
-        {
-            name: 'цене (DESC)',
-            sortProperty: 'price'
-        },
-        {
-            name: 'цене (ASC)',
-            sortProperty: '-price'
-        },
-        {
-            name: 'алфавиту (DESC)',
-            sortProperty: 'name'
-        },
-        {
-            name: 'алфавиту (ASC)',
-            sortProperty: '-name'
+    useEffect(() => {
+        const handleClickOutside = (event: any) => {
+            const sortRefCheck = sortRef.current
+            if (sortRefCheck) {
+                if (!event.composedPath().includes(sortRefCheck)) {
+                    setOpen(false)
+                    console.log('click outside')
+                }
+            }
         }
-        ]
+
+        document.body.addEventListener('click', handleClickOutside)
+
+        return () => {
+            document.body.removeEventListener('click', handleClickOutside)
+        }
+
+    }, [])
 
     const onClickListItem = (sort: ISortType) => {
-        onClickSortType(sort)
+        dispatch(setSortType(sort))
         setOpen(false)
     }
 
     return (
-        <div className="sort">
+        <div ref={sortRef} className="sort">
             <div className="sort__label">
                 <svg
                     width="10"
@@ -63,16 +80,16 @@ export const Sort = ({sortType, onClickSortType}: ISortProps) => {
                     />
                 </svg>
                 <b>Сортировка по:</b>
-                <span onClick={() => setOpen(!open)}>{sortType.name}</span>
+                <span onClick={() => setOpen(!open)}>{sortName}</span>
             </div>
             {open &&
                 <div className="sort__popup">
                     <ul>
-                        {list.map((popupItem, index) =>
+                        {sortList.map((popupItem, index) =>
                             <li
                                 key={`${index}_${popupItem}`}
                                 onClick={() => onClickListItem(popupItem)}
-                                className={sortType.name === popupItem.name ? 'active' : ''}
+                                className={sortName === popupItem.name ? 'active' : ''}
                             >
                                 {popupItem.name}
                             </li>
