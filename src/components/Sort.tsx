@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {useAppDispatch, useAppSelector} from "../redux/hooks/reduxHooks";
-import {setSortType} from "../redux/slices/filterSlice";
+import {selectSortName, setSortType} from "../redux/slices/filterSlice";
 
 interface ISortType {
     name: string
@@ -35,7 +35,8 @@ export const sortList = [
 ]
 
 export const Sort = () => {
-    const sortName = useAppSelector(state => state.filter.sort.name)
+    // @ts-ignore
+    const sortName = useAppSelector(selectSortName)
     const dispatch = useAppDispatch()
     const sortRef = useRef<HTMLDivElement>(null)
 

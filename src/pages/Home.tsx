@@ -9,6 +9,7 @@ import {setCategoryId, setCurrentPage, setFilters} from "../redux/slices/filterS
 import axios from "axios";
 import qs from 'qs';
 import {useNavigate} from "react-router-dom";
+import {fetchPizzas, setItems} from "../redux/slices/pizzaSlice";
 
 interface IPizza {
     id: number
@@ -28,23 +29,24 @@ const Home = ({searchValue}: { searchValue: string }) => {
     const isMounted = useRef(false)
 
     const {categoryId, sort, currentPage} = useAppSelector(state => state.filter)
-    const [pizzas, setPizzas] = useState<IPizza[]>([])
-    const [isLoading, setIsLoading] = useState(true)
+    const {items, status} = useAppSelector(state => state.pizza)
 
-    const fetchPizzas = () => {
-        setIsLoading(true)
+    const getPizzas = async () => {
 
         const sortBy = sort.sortProperty.replace('-', '')
         const order = sort.sortProperty.includes('-') ? 'asc' : 'desc'
         const category = categoryId > 0 ? `category=${categoryId}` : ''
         const search = searchValue ? `&search=${searchValue}` : ''
 
-        axios
-            .get(`https://63e4aefa4474903105ef68c6.mockapi.io/items?page=${currentPage}&limit=4&${category}&sortBy=${sortBy}&order=${order}${search}`)
-            .then(res => {
-                setPizzas(res.data)
-                setIsLoading(false)
+        dispatch(
+            fetchPizzas({
+                currentPage,
+                sortBy,
+                order,
+                category,
+                search
             })
+        )
 
     }
 
@@ -68,7 +70,8 @@ const Home = ({searchValue}: { searchValue: string }) => {
         window.scrollTo(0, 0)
 
         if (!isSearch.current) {
-            fetchPizzas()
+            console.log('Отработал')
+            getPizzas()
         }
 
         isSearch.current = false
@@ -90,7 +93,7 @@ const Home = ({searchValue}: { searchValue: string }) => {
     }, [categoryId, sort.sortProperty, currentPage])
 
     const skeletons = [...new Array(6)].map((_, index) => <Skeleton key={index}/>)
-    const pizzaList = pizzas.filter(obj => {
+    const pizzaList = items.filter(obj => {
             if (obj.name.toLowerCase().includes(searchValue.toLowerCase())) {
                 return true
             }
@@ -116,12 +119,18 @@ const Home = ({searchValue}: { searchValue: string }) => {
                 <Sort/>
             </div>
             <h2 className="content__title">Все пиццы</h2>
-            <div className="content__items">
-                {isLoading
-                    ? skeletons
-                    : pizzaList
-                }
-            </div>
+            {status === 'error'
+                ? <div className="content__error-info">
+                    <h2>Произошла ошибка 😕</h2>
+                    <p>К сожалению, не удалось получить питсы. Попробуйте повторить попытку позже.</p>
+                </div>
+                : <div className="content__items">
+                    {status === 'loading'
+                        ? skeletons
+                        : pizzaList
+                    }
+                </div>
+            }
             <Pagination currentPage={currentPage} onChangePage={onChangePage}/>
         </div>
     );

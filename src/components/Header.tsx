@@ -3,13 +3,14 @@ import logoSvg from "../assets/img/pizza-logo.svg";
 import {Link} from "react-router-dom";
 import Search, {ISearchProps} from "./Search";
 import {useAppSelector} from "../redux/hooks/reduxHooks";
+import {selectCart} from "../redux/slices/cartSlice";
 
 
 export const Header = ({ searchValue, setSearchValue }: ISearchProps) => {
 
-    const { pizzas, totalPrice } = useAppSelector(state => state.cart)
+    const { pizzas, totalPrice } = useAppSelector(selectCart)
 
-    const totalCount = pizzas.reduce((sum, obj) =>
+    const totalCount = pizzas.reduce((sum: number, obj: any) =>
         sum + obj.count, 0
     )
 
