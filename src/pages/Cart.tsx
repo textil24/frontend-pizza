@@ -1,32 +1,33 @@
 import React from 'react';
-import CartItem from "../components/CartItem";
-import {Link} from "react-router-dom";
-import {useDispatch} from "react-redux";
-import {useAppSelector} from "../redux/hooks/reduxHooks";
-import {clearPizzas} from "../redux/slices/cartSlice";
-import {CartEmpty} from "../components/CartEmpty";
+import {Link} from 'react-router-dom';
+import {useDispatch, useSelector} from 'react-redux';
 
-const Cart = () => {
+import {CartItem, CartEmpty} from '../components';
 
-    const dispatch = useDispatch()
-    const {totalPrice, pizzas} = useAppSelector(state => state.cart)
+import {selectCart} from '../redux/cart/selectors';
+import {clearItems} from '../redux/cart/slice';
+import Footer from "../components/Footer";
 
-    const totalCount = pizzas.reduce((sum, obj) =>
-        sum + obj.count, 0
-    )
+const Cart: React.FC = () => {
+    const dispatch = useDispatch();
+    const {totalPrice, items} = useSelector(selectCart);
 
+    const totalCount = items.reduce((sum: number, item: any) => sum + item.count, 0);
 
     const onClickClear = () => {
-        if (window.confirm('Ты действительно хочешь удалить все товар?')) {
-            dispatch(clearPizzas())
+        if (window.confirm('Очистить корзину?')) {
+            dispatch(clearItems());
         }
-    }
+    };
 
     if (!totalPrice) {
-        return <CartEmpty />
+        return <CartEmpty/>;
     }
 
+    console.log(items)
+
     return (
+
 
         <div className="container container--cart">
             <div className="cart">
@@ -59,9 +60,7 @@ const Cart = () => {
                         </svg>
                         Корзина
                     </h2>
-                    <div
-                        onClick={onClickClear}
-                        className="cart__clear">
+                    <div onClick={onClickClear} className="cart__clear">
                         <svg
                             width="20"
                             height="20"
@@ -98,10 +97,9 @@ const Cart = () => {
                     </div>
                 </div>
                 <div className="content__items">
-                    {pizzas.map(obj =>
-                        <CartItem key={obj.id} {...obj} />
-                    )
-                    }
+                    {items.map((item: any) => (
+                        <CartItem key={item.id} {...item} />
+                    ))}
                 </div>
                 <div className="cart__bottom">
                     <div className="cart__bottom-details">
@@ -139,6 +137,7 @@ const Cart = () => {
                 </div>
             </div>
         </div>
+
 
     );
 };

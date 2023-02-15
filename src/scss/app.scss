@@ -7,6 +7,18 @@ body {
   background-color: $background;
 }
 
+.pagination__wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.footer {
+  margin-top: 40px;
+  border-top: 1px solid #f6f6f6;
+  padding: 40px 0;
+  text-align: center;
+}
+
 .wrapper {
   width: calc(100vw - 100px);
   height: 100%;

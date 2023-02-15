@@ -1,27 +1,52 @@
-import React, {useState} from 'react';
-import {Header} from "./components/Header";
-import "./scss/app.scss"
-import Home from "./pages/Home";
-import NotFound from "./pages/NotFound";
-import {Route, Routes} from "react-router-dom";
-import Cart from "./pages/Cart";
+import Loadable from 'react-loadable'
+import React, { Suspense } from 'react';
+import { Routes, Route } from 'react-router-dom';
 
-const App = () => {
+import Home from './pages/Home';
 
-    const [searchValue, setSearchValue] = useState('')
+import './scss/app.scss';
+import MainLayout from './layouts/MainLayout';
 
-    return (
-        <div className="wrapper">
-            <Header searchValue={searchValue} setSearchValue={setSearchValue}/>
-            <div className="content">
-                <Routes>
-                    <Route path="/" element={<Home searchValue={searchValue}/>}/>
-                    <Route path="/cart" element={<Cart/>}/>
-                    <Route path="*" element={<NotFound/>}/>
-                </Routes>
-            </div>
-        </div>
-    );
-};
+const Cart = Loadable({
+  loader: () => import(/* webpackChunkName: "Cart" */ './pages/Cart'),
+  loading: () => <div>Идёт загрузка корзины...</div>,
+});
+
+const FullPizza = React.lazy(() => import(/* webpackChunkName: "FullPizza" */ './pages/FullPizza'));
+const NotFound = React.lazy(() => import(/* webpackChunkName: "NotFound" */ './pages/NotFound'));
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<MainLayout />}>
+        <Route path="" element={<Home />} />
+        <Route
+          path="cart"
+          element={
+            <Suspense fallback={<div>Идёт загрузка корзины...</div>}>
+              <Cart />
+            </Suspense>
+          }
+        />
+        <Route
+          path="pizza/:id"
+          element={
+            <Suspense fallback={<div>Идёт загрузка...</div>}>
+              <FullPizza />
+            </Suspense>
+          }
+        />
+        <Route
+          path="*"
+          element={
+            <Suspense fallback={<div>Идёт загрузка...</div>}>
+              <NotFound />
+            </Suspense>
+          }
+        />
+      </Route>
+    </Routes>
+  );
+}
 
 export default App;
