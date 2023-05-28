@@ -5,7 +5,7 @@
 # Стек:
 - **React** 
 - **Redux Toolkit** 
-- **SCSS:** 
+- **SCSS** 
  
 # Запуск проекта:
 
